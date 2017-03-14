@@ -4,11 +4,14 @@ var balance = 30;
 // Update the balance to reflect it as defined above
 updateBalance();
 
+// Create empty amounts object to edit later
+amounts = {};
+
 // Add products
-addProduct(1, "Cups", [10, 25, 50], [2, 4, 6]);
-addProduct(2, "Coffee", [20, 40, 60], [10, 14, 18]);
-addProduct(3, "Milk", [10, 25, 40], [1, 2, 3]);
-addProduct(4, "Sugar", [10, 20, 50], [3, 5, 8]);
+addProduct(1, "Cups", [100, 250, 500], [2, 4, 6], 0, 3, ' cups');
+addProduct(2, "Coffee", [2000, 4000, 6000], [10, 14, 18], 0, 20, 'g');
+addProduct(3, "Milk", [1000, 2500, 4000], [1, 2, 3], 0, 100, 'ml');
+addProduct(4, "Sugar", [100, 200, 500], [3, 5, 8], 0, 5, ' cubes');
 
 // Player requests to purchase a product
 function buy(productId, quantity, price) {
@@ -18,8 +21,9 @@ function buy(productId, quantity, price) {
 		balance -= price;
 		updateBalance();
 
-		// Update the current quantity field
-		document.getElementById(productId).children[1].innerHTML = parseInt(document.getElementById(productId).children[1].innerHTML) + quantity;
+		// Update the current quantity field.
+		// TODO: Replace this with its own function that also updates units singular/plural
+		document.getElementById(productId).children[1].children[0].innerHTML = parseInt(document.getElementById(productId).children[1].children[0].innerHTML) + quantity;
 	} else {
 		// The user does not have enough money
 		// TODO: Display a nicer alert
@@ -28,14 +32,14 @@ function buy(productId, quantity, price) {
 }
 
 // Rather than add products seperately in HTML statically, we can produce them programatically to make changes easier
-function addProduct(productId, name, quantities, prices) {
+function addProduct(productId, name, quantities, prices, min, max, units) {
 	// Create an empty string
 	productString = "";
 	// Add our HTML we want to insert to this string, inserting any relevant info we got passed in as arguments
 	productString +=
 		'<tr id="' + productId + '">' +
 		'<td>' + name + '</td>' +
-		'<td>0</td>' +
+		'<td><span>0</span><span>' + units + '</span></td>' +
 		'<td>' +
 		'<ul>';
 
@@ -44,7 +48,7 @@ function addProduct(productId, name, quantities, prices) {
 		// Add purchasing options with a for loop
 		for (var i = 0; i < quantities.length; i++) {
 			productString +=
-				'<li><a href="#" onclick="buy(\'' + productId + '\', ' + quantities[i] + ', ' + prices[i] + ')">' + quantities[i] + ' (£' + prices[i] + ')</a></li>';
+				'<li><a href="#" onclick="buy(\'' + productId + '\', ' + quantities[i] + ', ' + prices[i] + ')">' + quantities[i] + units + ' (£' + prices[i] + ')</a></li>';
 		}
 	} else {
 		// Log a useful error message so we can debug if something goes wrong
@@ -56,10 +60,18 @@ function addProduct(productId, name, quantities, prices) {
 	productString +=
 		'</ul>' +
 		'</td>' +
+		'<td><input id="' + productId + '_amountPerCustomer" type="range" min="' + min + '" max="' + max + '" value="0" oninput="updateAmount(' + productId + ')">' + ' <span id="' + productId + '_amountPerCustomerDisplay">0</span>' + units + '</td>' +
 		'</tr>';
 
 	// Update our HTML
 	document.getElementById('shop').innerHTML += productString;
+}
+
+// Update sliders visually and update amounts object
+function updateAmount(productId) {
+	var newValue = document.getElementById(productId + '_amountPerCustomer').value;
+	amounts[productId] = newValue;
+	document.getElementById(productId + '_amountPerCustomerDisplay').innerHTML = newValue;
 }
 
 // Visually updates the balance
