@@ -51,7 +51,7 @@ function addProduct(productId, name, quantities, prices) {
 		console.error("Dimensions mismatch: " + quantities.length + " quanties but " + prices.length + " prices in creating " + name + " with id " + productId);
 		return;
 	}
-	
+
 	// Add the closing HTML for our string
 	productString +=
 		'</ul>' +
@@ -60,7 +60,6 @@ function addProduct(productId, name, quantities, prices) {
 
 	// Update our HTML
 	document.getElementById('shop').innerHTML += productString;
-
 }
 
 // Visually updates the balance
